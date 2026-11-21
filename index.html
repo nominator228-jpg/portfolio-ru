@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Никита · AI-креатор</title>
+<meta property="og:title" content="Никита · AI Engineer">
+<meta property="og:description" content="ComfyUI, LoRA, Python-пайплайны фото и видео">
+<meta property="og:image" content="https://nominator228-jpg.github.io/portfolio-ru/media/primerka_final.jpg">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column like a Telegram post feed; sections read as "nodes" with typed input/output labels. */
+:root{
+  --bg:#16191e; --panel:#1f2329; --fg:#e8e6e1; --muted:#9aa1ab; --line:#30353d;
+  --ginger:#e9834c; --wire:#7fa7e0; --chip:#2a2f36; --code:#1a1d22;
+  --display:"Unbounded","Manrope",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(26px,6vw,38px);font-weight:700}
+h2{font-size:21px;font-weight:600}
+h3{font-size:15px;font-weight:600;font-family:var(--body)}
+p{margin:0}
+a{color:var(--wire)}
+a:focus-visible,video:focus-visible{outline:2px solid var(--ginger);outline-offset:2px}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ginger)}
+.muted{color:var(--muted)}
+section{display:flex;flex-direction:column;gap:16px}
+.head{display:flex;flex-direction:column;gap:12px}
+.role{font:500 15px/1.4 var(--mono);color:var(--muted)}
+.contacts{display:flex;flex-wrap:wrap;gap:8px}
+.contacts span,.contacts a{font:13px/1 var(--mono);background:var(--chip);padding:8px 10px;border-radius:6px;color:var(--fg);text-decoration:none}
+.contacts a{color:var(--wire)}
+.lead{font-size:17px}
+.wins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.win{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.win b{font-family:var(--mono);font-size:12px;color:var(--ginger);letter-spacing:.04em;text-transform:uppercase}
+.win p{font-size:14px}
+ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+/* pipeline as node chain */
+.flow{display:flex;flex-direction:column;gap:0}
+.node{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr;gap:4px;min-width:0}
+.node .t{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.node .t h3{font-size:15px}
+.node .tool{font:12px/1.3 var(--mono);color:var(--wire)}
+.node p{font-size:14px;color:var(--muted)}
+.wire{height:18px;width:2px;background:var(--wire);margin-left:22px;position:relative}
+.wire::after{content:"";position:absolute;bottom:-3px;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--wire)}
+/* videos */
+.reels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.reel{display:flex;flex-direction:column;gap:6px;min-width:0}
+.reel video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:var(--chip);display:block}
+.reel p{font-size:13px;line-height:1.4}
+.reel .badge{align-self:flex-start;font:600 11px/1.2 var(--mono);color:var(--bg);background:var(--ginger);padding:5px 7px;border-radius:4px}
+.reel .k{font:11px/1.2 var(--mono);color:var(--ginger);text-transform:uppercase;letter-spacing:.06em}
+/* stills */
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.strip img{height:260px;width:auto;border-radius:8px;scroll-snap-align:start;flex:none;max-width:none}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.fact{background:var(--chip);border-radius:8px;padding:10px 12px;font-size:13px;min-width:0}
+.fact b{display:block;font:600 12px/1.3 var(--mono);color:var(--fg);margin-bottom:2px}
+.ds{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ds img{height:150px;width:auto;border-radius:6px}
+.ds .arrow{font:600 13px var(--mono);color:var(--wire)}
+/* graphs */
+.graph{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.graph img{width:100%;border-radius:6px;display:block;cursor:zoom-in}
+.graph .nodes{display:flex;flex-wrap:wrap;gap:6px}
+.graph .nodes span{font:11px/1 var(--mono);padding:6px 8px;border-radius:5px;background:var(--chip);color:var(--wire)}
+.graph p{font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* api map */
+.api{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.chain{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.chain ol{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.chain code{font:12px var(--mono);color:var(--wire)}
+/* code */
+.codebox{overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:10px}
+pre{margin:0;padding:14px;font:12.5px/1.55 var(--mono);color:var(--fg)}
+.cm{color:var(--muted)} .kw{color:var(--ginger)} .st{color:var(--wire)}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.mod{background:var(--chip);border-radius:8px;padding:10px 12px;font-size:13px}
+.mod b{font:600 12px var(--mono);display:block}
+.mod span{font:12px var(--mono);color:var(--muted)}
+.stack{display:flex;flex-wrap:wrap;gap:6px}
+.stack span{font:12px/1 var(--mono);padding:7px 9px;border-radius:5px;border:1px solid var(--line)}
+.stack span.lvl{border-color:var(--ginger);color:var(--ginger)}
+footer{font-size:13px;color:var(--muted)}
+.quote{margin:0;padding:2px 0 2px 14px;border-left:3px solid var(--ginger);font:500 16px/1.5 var(--body);color:var(--fg)}
+.show{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:18px;align-items:start}
+.show video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:12px;background:var(--chip);display:block}
+.show .facts{grid-template-columns:1fr}
+@media (max-width:600px){.show{grid-template-columns:1fr}.show video{max-width:340px;margin:0 auto}}
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(10,12,15,.92);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+#lb img{max-width:100%;max-height:100%;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+@media (max-width:480px){.strip img{height:220px}.ds img{height:120px}}
+</style>
+<div class="wrap">
+
+<header class="head">
+  <span class="eyebrow">Портфолио · генеративный ИИ с ноября 2025</span>
+  <h1>Никита</h1>
+  <p class="role">AI-креатор · реалистичный UGC-контент для брендов · AI-видео и фото</p>
+  <div class="contacts">
+    <a href="mailto:nominator228@gmail.com">nominator228@gmail.com</a>
+    <a href="https://t.me/Nikita_Parhim4ik" target="_blank" rel="noopener">Telegram: @Nikita_Parhim4ik</a>
+    <a href="https://www.instagram.com/aipril.aidarova/" target="_blank" rel="noopener">instagram.com/aipril.aidarova</a>
+    <span>Удалённо · гражданство РБ</span>
+  </div>
+  <p class="lead">Делаю реалистичный AI-контент, который выглядит как снятый на телефон: UGC-рекламу, фэшн, липсинк, сюжетные ролики и тренды. Один и тот же персонаж узнаётся в каждом кадре. С ноября 2025 веду виртуальную блогершу Эйприл, у неё около 24 тыс. подписчиков в Instagram. С января по апрель 2026 делал для неё фэшн-кампании, коллабы, заказы брендов и липсинки.</p>
+  <blockquote class="quote">«Живу нейросетями. Цель — построить что-то большое».</blockquote>
+</header>
+
+<section>
+  <span class="eyebrow">Специализация</span>
+  <h2>Реалистичный UGC-контент для брендов</h2>
+  <p>Реклама, которая не выглядит рекламой: человек сам показывает товар, носит его, говорит о нём в камеру. Без студийного глянца, с живой камерой телефона и естественным светом.</p>
+  <div class="wins">
+    <div class="win"><b>Товар в кадре</b><p>Форма, цвет и логотип совпадают с оригиналом. Товар идёт отдельным референсом, поэтому его не перерисовывает модель.</p></div>
+    <div class="win"><b>Говорящая голова</b><p>Отзыв, обзор или распаковка от лица персонажа: липсинк, голос под кадр, взгляд в камеру.</p></div>
+    <div class="win"><b>Примерка и образы</b><p>Одежда на персонаже в разных позах и местах, крой и ткань держатся во всех кадрах.</p></div>
+    <div class="win"><b>Сюжет и хук</b><p>Первые 2 секунды цепляют, дальше короткая история вокруг товара. Вертикальный монтаж, готовый к публикации.</p></div>
+    <div class="win"><b>Тренды</b><p>Повторяю тренд Reels и TikTok с персонажем и товаром, без фильтров поверх чужого видео.</p></div>
+    <div class="win"><b>Вариации</b><p>Из одного удачного ролика делаю серию: новые хуки, форматы, персонажи, места. Удобно для тестов рекламы.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Главная работа</span>
+  <h2>Гиперреалистичная история</h2>
+  <div class="show">
+    <video src="media/showcase.mp4" poster="media/showcase.jpg" controls muted playsinline preload="metadata"></video>
+    <div class="facts">
+      <div class="fact"><b>Сюжет</b>Бомбер из секонда примерно за $1, а прохожий на улице предлагает за него сотни долларов.</div>
+      <div class="fact"><b>Консистентность</b>Реальные улицы Минска, комната Эйприл, второй персонаж в кадре. Лицо держится в каждом кадре.</div>
+      <div class="fact"><b>Скорость</b>Около часа на всё производство, от сценария до смонтированного ролика.</div>
+      <div class="fact"><b>Повторяемость</b>Формат — шаблон: на вход новая история, на выход новый готовый ролик.</div>
+    </div>
+  </div>
+  <p class="muted">Включите звук.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Работы</span>
+  <h2>Короткие ролики</h2>
+  <div class="reels">
+    <div class="reel"><video src="media/trend_final.mp4" poster="media/trend_final.jpg" controls muted playsinline preload="none"></video><span class="k">Тренд</span><span class="badge">Не vid2vid · генерация с нуля</span><p>Тренд из Reels повторён без исходного видео: каждый кадр и движение сгенерированы заново.</p></div>
+    <div class="reel"><video src="media/primerka_final.mp4" poster="media/primerka_final.jpg" controls muted playsinline preload="none"></video><span class="k">Примерка</span><p>Один персонаж, одна комната, серия образов. Лицо, одежда и поза — отдельными референсами.</p></div>
+    <div class="reel"><video src="media/krutilka_final.mp4" poster="media/krutilka_final.jpg" controls muted playsinline preload="none"></video><span class="k">Образ дня</span><p>Реальные локации Минска, вид как с камеры телефона, одно лицо во всех кадрах.</p></div>
+    <div class="reel"><video src="media/fired_step_detect.mp4" poster="media/fired_step_detect.jpg" controls muted playsinline preload="none"></video><span class="k">Монтаж под музыку</span><p>Склейки попадают в бит и в шаги.</p></div>
+  </div>
+  <p class="muted">Здесь ролики на моём собственном стеке. Работы января–апреля сделаны на прошлом поколении моделей, поэтому их не показываю. Готов сделать тестовый ролик по вашему брифу.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Инструменты</span>
+  <h2>С чем работаю</h2>
+  <div class="facts">
+    <div class="fact"><b>Видео</b>Seedance 2.5 (основной), Kling, Veo</div>
+    <div class="fact"><b>Картинки</b>Nano Banana (последняя), Seedream, GPT Image, Midjourney</div>
+    <div class="fact"><b>Платформы</b>Higgsfield, Magnific</div>
+    <div class="fact"><b>Свой стек</b>ComfyUI и open-source модели на облачных GPU (Qwen-Image 2.1, Flux, MiniMax H3), свои LoRA персонажей</div>
+    <div class="fact"><b>Монтаж</b>Premiere Pro, After Effects, DaVinci Resolve; с ИИ-агентами — Remotion, HyperFrames</div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Ремесло</span>
+  <h2>Как получаю хороший кадр</h2>
+  <ul class="tight">
+    <li><b>Структура промпта.</b> Кто → что делает → крупность и объектив → движение камеры → свет → фактура и плёнка → что не должно меняться. Для видео расписываю по секундам: «[0–2 с] двери открываются… [2–4 с] закрываются полностью».</li>
+    <li><b>Референсы по ролям.</b> Лицо, одежда, место, поза и товар — отдельными референсами, а в промпте сказано, какой за что отвечает. Лист персонажа с 3 ракурсами держит одного человека во всех шотах.</li>
+    <li><b>Первый и последний кадр.</b> Для переходов и эффектов генерирую первый и последний кадр, а Seedance анимирует движение между ними.</li>
+    <li><b>3D-референс камеры.</b> Для сложного пролёта собираю простую 3D-сцену (её строит Claude), рендерю путь камеры и даю Seedance 2.5 как референс движения.</li>
+    <li><b>Черновики дёшево, финал чисто.</b> Итерации в низком разрешении, финальный проход в 720p/1080p. Бюджет уходит только на удачные шоты.</li>
+    <li><b>Проверка перед сдачей.</b> Руки, размер головы, направление света, фактура кожи, текст на вывесках, синхрон губ. Брак до клиента не доходит.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">Монтаж</span>
+  <h2>Больше 3 лет в монтаже</h2>
+  <p>Монтирую больше трёх лет, в том числе коммерческие проекты. Генерация — половина ролика, вторая половина — ритм, склейки и звук.</p>
+  <div class="wins">
+    <div class="win"><b>Классический монтаж</b><p>Premiere Pro, After Effects, DaVinci Resolve: склейка, моушн, цветокоррекция, звук. Коммерческие заказы.</p></div>
+    <div class="win"><b>Монтаж с ИИ-агентами</b><p>Освоил монтаж через ИИ-агентов в Remotion и HyperFrames: ролик собирается кодом, правка — это новая итерация за минуты, а не ручная пересборка таймлайна.</p></div>
+    <div class="win"><b>Автоматические пайплайны</b><p>Могу собрать пайплайн, который сам качественно монтирует ролики определённого формата: склейки под бит, титры, звук, вертикаль. Новый материал на вход — готовый ролик в едином стиле на выходе.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Как работаю</span>
+  <h2>От брифа до готового ролика</h2>
+  <div class="flow">
+    <div class="node"><div class="t"><h3>Бриф</h3><span class="tool">вопросы до старта</span></div><p>Формат, настроение, референсы, что должно совпасть точно: товар, одежда, лицо.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Ключевые кадры</h3><span class="tool">сначала картинки</span></div><p>Ключевые кадры на согласование до генерации видео. Так правки дешёвые.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Видео и монтаж</h3><span class="tool">Seedance · Kling · Veo</span></div><p>Анимация, звук, монтаж в нужном формате.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Правки</h3><span class="tool">быстро</span></div><p>Правки по комментариям, потом вариации лучшей версии: новые хуки, форматы, персонажи.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">LoRA</span>
+  <h2>Персонаж узнаётся в каждом кадре</h2>
+  <div class="ds">
+    <img src="media/dataset_01.jpg" alt="Кадр датасета 1">
+    <img src="media/dataset_02.jpg" alt="Кадр датасета 2">
+    <img src="media/dataset_03.jpg" alt="Кадр датасета 3">
+    <span class="arrow">датасет → обучение →</span>
+  </div>
+  <div class="strip">
+    <img src="media/lora_frame_03.jpg" alt="Генерация с LoRA, кадр 3">
+    <img src="media/lora_frame_05.jpg" alt="Генерация с LoRA, кадр 5">
+    <img src="media/lora_frame_07.jpg" alt="Генерация с LoRA, кадр 7">
+    <img src="media/lora_frame_08.jpg" alt="Генерация с LoRA, кадр 8">
+  </div>
+  <div class="facts">
+    <div class="fact"><b>Модели</b>Flux, Qwen-Image 2.1, Fibo 2</div>
+    <div class="fact"><b>Обучение</b>ai-toolkit, rank 16, flowmatch, adamw8bit, bf16, квантизация</div>
+    <div class="fact"><b>Датасет</b>43 кадра, подписи «триггер + сцена», черты лица не описываются</div>
+    <div class="fact"><b>Выбор чекпоинта</b>сравнивал чекпоинты от 250 до 3000 шагов</div>
+    <div class="fact"><b>Стек LoRA на кадр</b>персонаж 1.0 + стиль камеры 0.7 + turbo</div>
+    <div class="fact"><b>LoRA для видео</b>реализм и turbo для MiniMax H3</div>
+  </div>
+</section>
+
+
+<section>
+  <span class="eyebrow">Бонус · автоматизация</span>
+  <h2>Конвейер: от идеи до поста без рук</h2>
+  <p class="muted">Каждый шаг — отдельный модуль. Шаги передают друг другу файлы и проходят гейты, поэтому сбой виден сразу и не доходит до публикации.</p>
+  <div class="flow">
+    <div class="node"><div class="t"><h3>Сюжет</h3><span class="tool">Claude · дневник персонажа</span></div><p>Агент ведёт жизнь Эйприл и решает, что снимать сегодня: образ, место, действие.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Референсы</h3><span class="tool">Pinterest · OpenCLI · своя библиотека</span></div><p>Находит рефы одежды, мест и поз, кадрирует и добавляет в задачу.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Облачный GPU</h3><span class="tool">RunPod API</span></div><p>Арендует подходящий GPU, ставит ComfyUI, ноды и веса с HuggingFace, следит за простоем и лимитами.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Кадры</h3><span class="tool">ComfyUI · Qwen-Image 2.1 / Fibo 2 + LoRA</span></div><p>Пакетно, с ControlNet и мультирефом; апскейл лица отдельным графом.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Видео</h3><span class="tool">ComfyUI · MiniMax H3 i2v / ref2v</span></div><p>Клип со звуком из кадра, интерполяция RIFE, ускорение SageAttention.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Проверка</h3><span class="tool">Python-гейты</span></div><p>Автопроверка: артефакты, лицо, размер, длительность. Брак дальше не идёт.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Монтаж</h3><span class="tool">Remotion / HyperFrames · анализ позы и музыки</span></div><p>Подбор трека, нарезка в бит, текст и субтитры.</p></div>
+    <div class="wire"></div>
+    <div class="node"><div class="t"><h3>Публикация</h3><span class="tool">Upload-Post · Telegram-бот</span></div><p>Пост в соцсети и отчёт в Telegram: что вышло, что упало и почему.</p></div>
+  </div>
+</section>
+
+<section id="graphs">
+  <span class="eyebrow">ComfyUI</span>
+  <h2>Мои воркфлоу</h2>
+  <p class="muted">Скрины из живого ComfyUI. Нажмите на картинку, чтобы увеличить.</p>
+  <div class="graph"><h3>Стек LoRA: персонаж на локации</h3><div class="two"><img src="media/graphs/01_overview.jpg" alt="Граф стека LoRA целиком"><img src="media/graphs/01_detail1.jpg" alt="Ноды LoRA и сэмплер"></div><div class="nodes"><span>LoraLoaderModelOnly ×2</span><span>Qwen-Image 2.1 int8</span><span>KSampler res_2m/beta</span><span>multi-ref encode</span></div><p>Моя LoRA + LoRA стиля камеры; локация приходит рефом.</p></div>
+  <div class="graph"><h3>ControlNet depth: персонаж в локации</h3><div class="two"><img src="media/graphs/02_overview.jpg" alt="Граф ControlNet depth целиком"><img src="media/graphs/02_detail1.jpg" alt="Ноды ControlNet"></div><div class="nodes"><span>Qwen-Image Fun ControlNet Union</span><span>DiffSynth ControlNet</span><span>ModelPatchLoader</span></div><p>Глубина сцены держит геометрию места, LoRA держит лицо.</p></div>
+  <div class="graph"><h3>ControlNet pose: портрет по позе</h3><div class="two"><img src="media/graphs/03_overview.jpg" alt="Граф ControlNet pose целиком"><img src="media/graphs/03_detail1.jpg" alt="Ноды позы"></div><div class="nodes"><span>ControlNet pose</span><span>KSamplerAdvanced</span><span>LoRA</span></div><p>Поза по скелету, сэмплинг в два этапа.</p></div>
+  <div class="graph"><h3>Апскейл лица по маске</h3><div class="two"><img src="media/graphs/04_overview.jpg" alt="Граф апскейла лица целиком"><img src="media/graphs/04_detail1.jpg" alt="Ноды маски и склейки"></div><div class="nodes"><span>ImageCrop</span><span>FeatherMask</span><span>ImageCompositeMasked</span><span>ColorMatch</span><span>denoise 0.45</span></div><p>Лицо вырезается, перерисовывается с LoRA и вклеивается обратно без шва.</p></div>
+  <div class="graph"><h3>Ref → video: 4 рефа в клип со звуком</h3><div class="two"><img src="media/graphs/05_detail1.jpg" alt="Ноды MiniMax H3 ref2v"><img src="media/graphs/05_detail2.jpg" alt="Сэмплер и видео-LoRA"></div><div class="nodes"><span>MiniMaxH3ReferenceToVideo</span><span>turbo LoRA 4 шага</span><span>SamplerCustomAdvanced</span></div><p>Лицо, образ, поза и место — отдельными рефами.</p></div>
+  <div class="graph"><h3>Беговая дорожка: 5 цепочек кадр → видео в одном графе</h3><img src="media/graphs/06_overview.jpg" alt="Граф беговой дорожки с пятью цепочками"><div class="two"><img src="media/graphs/06_detail1.jpg" alt="Flux 2 Klein мультиреф"><img src="media/graphs/06_detail2.jpg" alt="RIFE и сборка видео"></div><div class="nodes"><span>Flux 2 Klein MultiRef</span><span>подграфы ×5</span><span>RIFE VFI</span><span>VideoCombine</span><span>cleanGpuUsed</span></div><p>5 промптов идут по цепочке «промпт → кадр → видео»; на выходе 5 готовых клипов.</p></div>
+  <div class="graph"><h3>Image → video со звуком и ускорением</h3><div class="two"><img src="media/graphs/07_detail1.jpg" alt="Ноды MiniMax H3 i2v и ускорения"><img src="media/graphs/07_detail2.jpg" alt="Интерполяция и звук"></div><div class="nodes"><span>MiniMaxH3ImageToVideo</span><span>Spectrum</span><span>SageAttention</span><span>SolAttn</span><span>VAEDecodeAudio</span></div><p>Ускорение на 4090/5090 без потери качества.</p></div>
+  <div class="graph"><h3>Редактирование по нескольким рефам</h3><div class="two"><img src="media/graphs/08_overview.jpg" alt="Граф мультиреф-редактирования"><img src="media/graphs/08_detail1.jpg" alt="Рефы и энкодер Qwen"></div><div class="nodes"><span>Qwen-Image 2.1 Edit</span><span>3 рефа</span></div><p>Замена IP-Adapter: лицо, одежда и место идут в текстовый энкодер картинками.</p></div>
+</section>
+
+<section>
+  <span class="eyebrow">API-интеграции</span>
+  <h2>Какие сервисы связал</h2>
+  <div class="api">
+    <div class="chain"><h3>Поиск рефов</h3><ol><li>Агент пишет запрос</li><li><code>OpenCLI → Pinterest</code> собирает выдачу</li><li>Фильтр и кадрирование на Python</li><li>Загрузка во вход ComfyUI</li></ol></div>
+    <div class="chain"><h3>Генерация в облаке</h3><ol><li><code>RunPod REST</code>: выбор GPU, ретраи, потолок цены</li><li>Веса с <code>HuggingFace</code> / <code>Civitai</code></li><li><code>ComfyUI /prompt</code> → <code>/history</code> → скачивание</li><li>Под удаляется после работы</li></ol></div>
+    <div class="chain"><h3>Тексты и сценарии</h3><ol><li><code>Claude</code> в ролях: сценарист, генерация, монтаж</li><li><code>OpenRouter</code> / <code>Gemini</code> для разовых задач</li><li>Результат проверяют гейты</li></ol></div>
+    <div class="chain"><h3>Публикация и связь</h3><ol><li><code>Upload-Post</code> / <code>Zernio</code> публикуют ролик</li><li><code>Telegram Bot API</code>: отчёты и кнопки решений</li><li>Сбор комментариев и статистики</li></ol></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Python</span>
+  <h2>Код под капотом</h2>
+  <div class="mods">
+    <div class="mod"><b>Comfy_generation/tools</b><span>52 файла · 8.8k строк</span><br>ComfyUI API, RunPod, графы</div>
+    <div class="mod"><b>persona/tools</b><span>22 файла · 7.5k</span><br>рефы, комментарии, статистика</div>
+    <div class="mod"><b>Remotion/vision</b><span>9 файлов · 5.1k</span><br>поза, шаги, ритм музыки</div>
+    <div class="mod"><b>automation</b><span>4 файла · 2.3k</span><br>оркестратор, расписание, гейты</div>
+    <div class="mod"><b>telegram</b><span>2 файла · 1.5k</span><br>отчёты бота</div>
+    <div class="mod"><b>autoposting</b><span>6 файлов · 0.9k</span><br>публикация</div>
+  </div>
+  <div class="codebox"><pre><span class="cm"># comfy_client.py — поставить граф в очередь ComfyUI и дождаться результата</span>
+<span class="kw">def</span> queue(url, graph):
+    r = requests.post(<span class="st">f"{url}/prompt"</span>,
+        json={<span class="st">"prompt"</span>: graph, <span class="st">"client_id"</span>: str(uuid.uuid4())}, timeout=30)
+    data = r.json()
+    <span class="kw">if</span> data.get(<span class="st">"error"</span>) <span class="kw">or</span> data.get(<span class="st">"node_errors"</span>):
+        <span class="kw">raise</span> RuntimeError(<span class="st">f"ComfyUI error: {data}"</span>)
+    <span class="kw">return</span> data[<span class="st">"prompt_id"</span>]
+
+<span class="kw">def</span> wait(url, prompt_id, timeout, interval=5):
+    start = last_contact = time.time()
+    <span class="kw">while</span> time.time() - start &lt; timeout:
+        job = poll_history(url, prompt_id)
+        <span class="kw">if</span> job: last_contact = time.time()
+        <span class="kw">if</span> time.time() - last_contact &gt; UNREACHABLE_AFTER:
+            <span class="kw">raise</span> RuntimeError(<span class="st">"pod stopped or crashed"</span>)
+        <span class="kw">if</span> job <span class="kw">and</span> job[<span class="st">"status"</span>].get(<span class="st">"status_str"</span>) == <span class="st">"error"</span>:
+            <span class="kw">raise</span> RuntimeError(error_details(job))  <span class="cm"># какая нода упала и почему</span>
+        <span class="kw">if</span> job <span class="kw">and</span> job[<span class="st">"status"</span>].get(<span class="st">"completed"</span>):
+            <span class="kw">return</span> job
+        time.sleep(interval)</pre></div>
+</section>
+
+<section>
+  <span class="eyebrow">Стек</span>
+  <div class="stack">
+    <span>Python</span><span>asyncio</span><span>requests</span><span>TypeScript</span><span>Remotion</span><span>HyperFrames</span><span>ComfyUI</span><span>ai-toolkit</span><span>Qwen-Image 2.1</span><span>Fibo 2</span><span>Flux 2</span><span>MiniMax H3</span><span>ControlNet</span><span>RunPod</span><span>HuggingFace</span><span>Claude Code</span><span>MCP</span><span>Git</span><span>Linux / macOS</span>
+    <span class="lvl">Агентная разработка · продвинутый</span><span class="lvl">Облачные GPU · продвинутый</span>
+  </div>
+</section>
+
+<footer>Генеративный ИИ с ноября 2025. Все ролики и кадры на этой странице сгенерированы, без съёмок и vid2vid.</footer>
+</div>
+
+<div id="lb" hidden><img alt=""></div>
+<script>
+const lb=document.getElementById('lb'),li=lb.querySelector('img');
+document.querySelectorAll('.graph img').forEach(i=>i.addEventListener('click',()=>{li.src=i.src;li.alt=i.alt;lb.hidden=false}));
+lb.addEventListener('click',()=>{lb.hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.hidden=true});
+document.querySelectorAll('video').forEach(v=>v.addEventListener('play',()=>{document.querySelectorAll('video').forEach(o=>{if(o!==v)o.pause()})}));
+</script>
+
+<script>
+try{const tg=window.Telegram&&Telegram.WebApp;if(tg&&tg.initData!==undefined){tg.ready();tg.expand();
+tg.setHeaderColor('#16191e');tg.setBackgroundColor('#16191e');}}catch(e){}
+</script>
+</body>
+</html>
